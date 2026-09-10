@@ -18,3 +18,7 @@ Enlaces :
 Imagen
 
 ![Perro](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE1auwjimtVx2z9X4hqirSLf49YS0OTuL90ouXBQT5l3df-Vh7j4IYNZHJ&s=10)
+
+```html
+<h1>Hola</h1>
+```
