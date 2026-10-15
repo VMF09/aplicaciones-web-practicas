@@ -251,7 +251,7 @@ sudo chmod 640 /etc/apache2/.htpasswd
 sudo nano /etc/apache2/sites-available/sitio-alumno.conf
 ```
 
-Incluimos estas directvas en nuestro VirtualHost, permitimos AuthConfig con AllowOverride solo si se configura la autenticación en .htaccess :
+Incluimos estas directivas en nuestro VirtualHost, permitimos AuthConfig con AllowOverride solo si se configura la autenticación en .htaccess :
 
 ```apache
 <Directory /var/www/sitio-alumno/privado>
@@ -299,6 +299,8 @@ systemctl is-active apache2
 
 Explicación corta :   la actualización nos permite consultar versiones recientes de los paquetes disponibles.  Comprobamos que Apache confirma que se parte de la práctica anterior y que el servidor web sigue operativo.
 
+[Comprobación de Apache activo](<img/systemctl is-active apache2.png>)
+
 #### Apartado 2. Instalación de MariaDB.
 
 ```bash
@@ -307,6 +309,8 @@ mariadb --version
 ```
 
 Explicación corta :   mariadb-server instala el servicio que ejecuta el motor de base de datos.  mariadb --version comprueba que el cliente de línea de comandos está disponible y muestra la versión.
+
+[Versión de MariaDB instalada](<img/version.png>)
 
 **¿Qué diferencia hay entre mariadb-server y mariadb-client? ¿Cuál has instalado?**
 
@@ -324,6 +328,8 @@ systemctl is-enabled mariadb
 ```
 
 Explicación corta :   active indica que el servicio está ejecutándose en este momento.  enabled indica que se iniciará automáticamente al arrancar el equipo.
+
+[Estado del servicio y entrada en MariaDB](<img/estado y entrada.png>)
 
 ### 3.2 Entrar en la base de datos.
 
@@ -367,6 +373,8 @@ Explicación :   la prueba nos muestra cñomo distinguir un fallo de conexión c
 **Si WordPress no pudiera conectar con la base de datos, ¿qué dos comandos usarías para saber si MariaDB está parado?**
 *systemctl is-acitve mariadb nos ofrece el estado breve y sudo systemctl status mariadb nos muestra los detalles y mensajes recientes.  Si está parado, sudo systemctl start mariadb lo arrancaría.*
 
+[Error al detener MariaDB y recuperación del servicio](<img/error y recuperación.png>)
+
 #### Apartado 6. Instalación de PHP
 
 WordPress está desarrollado en PHP, se instala el intérprete, el módulo que integra PHP con Apache y las extensiones necesarias para conectarse a MariaDB y cubrir funciones habituales de WordPress.
@@ -381,6 +389,8 @@ php -m | grep -i mysql
 
 php instala el lenguaje, libapache2-mod-php integra PHP con Apache, php-mysql permite conexión con MariaDB, php-curl realiza las conexiones HTTP, php-gd procesa imágenes, php-mbstring trata texto multibyte, php-xml procesa XML, php-zip maneja ZIP, php-intl aporta las funciones de internacionalización.  Se esperan mpm_prefork_module y php_module, php -m debería mostrar mysqli, mysqlnd y pdo_mysql.
 
+[Versión de PHP](<img/php -v.png>)
+
 Explicación corta :   el reinicio permite a Apache cargar el módulo PHP recién instalado.  Las extensiones MySQL permiten que las aplicacones PHP, como WordPress, se comuniquen con MariaDB.
 
 ```bash
@@ -393,6 +403,7 @@ Abrimos http://192.168.56.10/info.php en el navegador para poder comprobar que A
 sudo rm /var/www/html/info.php
 ls /var/www/html
 ```
+[Comprobación de PHP mediante phpinfo](<img/php.info.png>)
 
 **¿Por qué es peligroso dejar info.php en un servidor real? ¿Para qué sirve php-mysql?**
 *info.php nos revela información detallada de versiones y configuraciones, debe eliminarse tras la prueba.  php.mysql nos instala las extensiones para que PHP pueda comunicarse con MariaDB/MySQL.*
