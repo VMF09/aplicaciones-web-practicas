@@ -430,3 +430,482 @@ PHP :   PHP 8.2 > Funcionando y preparado para MariaDB
 Durante la instalación y la comprobación del entorno LAMP ( Apache + PHP + MariaDB ), hemos conseguido que el servidor mostrara correctamente la página info.php, con esto hemos verificado que PHP estaba instalado y funcionando.  Finalmente, el servidor nos respondió como debía y pudimos validar la configuración del sistema sin errores.
 
 Encontré un error durante la instalación, este fue que el archivo info.php devolvía error 404.  Aunque el archivo estaba en /var/www/html, Apache no estaba usando esa carpeta como DocumentRoot para las peticiones al puerto 80.  Para poder solucionarlo, he revisado la configuración con apache2ctl -S y descubrí que el VirtualHost por defecto era intranet.local, cuyo DocumentRoot era /var/www/intranet.  Moví info.php a esa carpeta y el servidor empezó a funcionar correctamente. También tenía un error de multiples VirtualHosts activos a causa de practicas anteriores, esto hacía que la IP sin dominio no usara /var/www/html.  Para solucionar esto, identifiqué cuál era el sitio por defecto y ajusté la ubicación del archivo para que coincidiera con el DocumentRoot real.  Otro error que encontré fue que Apache no estaba interpretando PHP.  Solucioné esto confirmando que libapache2-mod-php estaba instalado y reinicié Apache para asegurar que el módulo estuviera cargado.
+
+### 5. Instalación de WordPress.
+## 5.1 ¿Qué es WordPress?
+# Introducción
+Wordpress es un sistema de Gestión de Contenidos ( CMS, Content Management System ) de código abierto que permite crear y administrar sitios web de forma sencilla mediante una interfaz web desde cualquier navegador.
+
+Está desarrolado en PHP y utiliza bases de datos MySQL o MariaDB para poder almacenar toda la información de la página web. Actualmente es uno de los CMS más utilizados para la creación de blogs, páginas corporativas, portafolios y tiendas online.
+
+### Características pricipales
+
+- Es un Software libre y gratuito.
+- Es fácil de administrar mediante interfaz web.
+- También es compatible con Apache, PHP y MariaDB.
+- Permite instalar temas para cambiar el diseño.
+- Permita instalar plugins para añadir funcionalidades.
+- Tiene gestión de usuarios y permisos.
+- Tiene una amplia comunidad de soporte.
+
+### Arquitectura básica
+
+WordPress funciona gracias a la integración de los siguientes componentes :
+
+- Apache: es un servidor web encagado de atender las peticiones de los usuarios.
+- PHP: es el lengguaje utilizado para ejecutar WordPress.
+- MariaDB: es la base de datos donde se almacena toda la inforación del sitio.
+- Archivos de WordPress: estos contienen el núcleo de la aplicación, los temas y los plugins.
+
+Cuando un suario visita una página de WordPress, Apache recibe la petición, PHP ejecuta el código correspondiente y MariaDB devuelve la información solicitada.
+
+---
+
+## 5.2 Instalación paso a paso de WordPress y prueba de uso
+
+### Objetivo
+
+Instalar WordPress sobre un Ubuntu Server utilizando Apache, PHP y MariaDB, publicándolo mediante un Virtual Host independiente en el puerto 8080sin que afecte a sitios ya configurados en nuestro servidor.
+
+---
+
+## Paso 1. Comprobación inicial del sistema.
+
+Antes de comenzar la instalación, verificamos que Apache y MariaDB están funcionando correctamente.
+
+### Comprobación de servicios
+
+```bash
+systemctl is-active apache2 mariadb
+```
+
+Resultado esperado:
+
+```text
+active
+active
+```
+
+### Comprobación de PHP
+
+```bash
+php -v
+```
+
+Este comando nos muestra los puertos en los que Apache está escuchando conexiones.
+
+---
+
+## Paso 2. Creación de la base de datos
+
+### Acceso a MariaDB
+
+```bash
+sudo mariadb
+```
+
+### Creación de la base de datos
+
+```sql
+CREATE DATABASE wordpress
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+Se creará una base de datos llamada `wordpress` preparada para almacenar caracteres especiales y diferentes idiomas.
+
+### Creación del usuario
+
+```sql
+CREATE USER 'wp_user'@'localhost'
+IDTENFIED BY '********';
+```
+
+Se crea un usuario específico solo para WordPress.
+
+### Asignación de permisos
+
+```sql
+FLUSH PRIVILEGES;
+```
+
+### Salida de MariaDB
+
+```sql
+EXIT;
+```
+
+### Comprobación del usuario
+
+```bash
+mariadb -u wp_user -p wordpress
+```
+
+Una vez estamos dentro:
+
+```sql
+SHOW TABLES;
+```
+
+Resultado esperado:
+
+```text
+Empty set
+```
+
+Lo anterior nos indica que la base de datos existe y que el usuario tiene permisos para acceder a ella.
+
+---
+
+## Paso 3. Descarga de WordPress
+
+### Acceso al directorio temporal
+
+```bash
+cd /tmp
+```
+
+### Descarga del paquete oficial
+
+```bash
+wget https://wordpress.org/latest.tar.gz
+```
+
+### Descompresión
+
+```bash
+tar -zxf latest.tar.gz
+```
+
+### Comprobación del contenido 
+
+```bash
+ls wordpress
+```
+
+Se mostrarán los directorios y archivos que pertenecen a WordPress.
+
+---
+
+## Paso 4. Instalación de los archivos
+
+### Creación del directorio web
+
+```bash
+sudo mkdir -p /var/www/wordpress
+```
+
+### Copia de los archivos
+
+```bash
+sudo cp -a /tmp/wordpress/. /var/www/wordpress/
+```
+
+### Verificación 
+
+```bash
+ls /var/www/wordpress
+```
+
+Deberán aparecer directorios como estos:
+
+```text
+wp-admin
+wp-content
+wp-includes
+```
+
+---
+
+## Paso 5. Configuración de permisos
+
+### Asignación de propietario
+
+```bash
+sudo chown -R www-data:www-data /var/www/wordpress
+```
+
+### Permisos para directorios
+
+```bash
+sudo find /var/www/wordpress -type d -exec chmod 755 {} \;
+```
+
+### Permisos para archivos
+
+```bash
+sudo find /var/www/wordpress -type f -exec chmod 644 {} \;
+```
+
+### Verificación
+
+```bash
+ls -ld /var/www/wordpress
+```
+
+El propietario deberá tener:
+
+```text
+www-data www-data
+```
+
+---
+
+## Paso 6. Configuración de Apache
+
+### Apertura del puerto 8080
+
+Editaremos el archivo de configuración de puertos de Apache.
+
+```bash
+sudo nano /etc/apache2/ports.conf
+```
+
+Añadiremos la siguiente línea:
+
+```apache
+Listen 8080
+```
+
+### Verificación 
+
+```bash
+grep Listen /etc/apache2/ports.conf
+```
+
+Deberá aparecer:
+
+```text
+Listen 8080
+```
+
+---
+
+## Paso 7. Creación del Virtual Host
+
+### Creación del fichero de configuración
+
+```bash
+sudo nano /etc/apache2/sites-available/wordpress.conf
+```
+
+Contenido del fichero:
+
+```apache
+<VirtualHost *:8080>
+
+    ServerName wordpress.local
+
+    DocumentRoot /var/www/wordpress
+
+    <Directory /var/www/wordpress>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/wordpress_error.log
+    CustomLog ${APACHE_LOG_DIR}/wordpress_access.log combined
+
+</VirtualHost>
+```
+
+Este Virtual Host nos permitirá publicar WordPress en el puerto 8080 utilizando su propio directorio web.
+
+---
+
+## Paso 8. Activación del sitio
+
+### Activación del módulo rewrite
+
+```bash
+sudo a2ensite wordpress.conf
+```
+
+### Comprobación de sintaxis
+
+```bash
+sudo apachetctl configtest
+```
+
+Resultado esperado:
+
+```text
+Syntax OK
+```
+
+### Reinicio de Apache
+
+```bash
+sudo systemctl restart apache2
+```
+
+### Comprobación de sitios activos
+
+```bash
+ls /etc/apache2/sites-enabled/
+```
+
+Debe aparecer:
+
+```text
+wordpress.conf
+```
+
+---
+
+## Paso 9. Instalación desde el navegador
+
+### Acceso a WordPress
+
+Se obtuvo la dirección IP de la máquina virtual mediante:
+
+```bash
+ip a
+```
+
+Antes accedimos desde el navegador mediante:
+
+```text
+http://IP_DE_NUESTRO_SERVIDOR:8080
+```
+
+### Datos de conexión a la base de datos
+
+| Campo | Valor |
+|---------|---------|
+| Base de datos | wordpress |
+| Usuario | wp_user |
+| Contraseña | Contraseña configurada |
+| Servidor de base de datos | localhost |
+| Prefijo de tablas | wp_ |
+
+### Configuración del sitio
+
+Se configran los siguientes parámetros:
+
+- Título del sitio.
+- Usuario administrador.
+- Contraseña del administrador.
+- Dirección de correo electrónico.
+
+Una vez finalizado el asistente, WordPress quedaría instalado correctamente.
+
+---
+
+## Paso 10. Comprobación de la configuración interna
+
+### Verificación del archivo de configuración
+
+```bash
+sudo grep -E "DB_NAME|DB_USER|DB_HOST" /var/www/wordpress/wp-config.php
+```
+
+Resultado esperado:
+
+```php
+define('DB_NAME', 'wordpress');
+define('DB_USER', 'wp_user');
+define('DB_HOST', 'localhost');
+```
+
+### Protección del archivo
+
+```bash
+sudo chmod 640 /var/www/wordpress/wp-config.php
+```
+
+### Comprobación de permisos
+
+```bash
+ls -l /var/www/wordpress/wp-config.php
+```
+
+---
+
+### Consulta de tablas de WordPress
+
+```bash
+mariadb -u wp_user -p wordpress
+```
+
+Dentro de MariaDB:
+
+```sql
+SHOW TABLES;
+```
+
+WordPress crea automáticamente tablas como:
+
+```text
+wp_users
+wp_posts
+wp_options
+wp_comments
+```
+
+### Comprobación de la URL del sitio
+
+```sql
+SELECT option_name, option_value
+FROM wp_options
+WHERE option_name IN ('siteurl','blogname');
+```
+
+### Comprobación del usuario administrador
+
+```sql
+SELECT user_login FROM wp_users;
+```
+
+---
+
+## Paso 11. Prueba de funcionamiento
+
+### Creación de una entrada
+
+Desde el panel de administración:
+
+```text
+Entradas > Añadir nueva entrada
+```
+
+Título:
+
+```text
+Hola desde mi WordPress
+```
+
+Contenido:
+
+```text
+Esta es mi primera entrada creada durante la práctica.
+```
+
+Después se publica la entrada.
+
+### Subida de una imagen
+
+Desde:
+
+```text
+Medios > Añadir nuevo archivo multimedia
+```
+
+Se sube una imagen al sitio web.
+
+### Comprobación en la base de datos
+
+```sql
+SELECT ID, post_title, post_type, post_status
+FROM wp_posts
+ORDER BY ID DESC
+LIMIT 5;
+```
+
+### Comprobación del almacenamiento de imágenes
+
+```bash
+ls -R /var/www/wordpress/wp-content/uploads
+```
+
+---
