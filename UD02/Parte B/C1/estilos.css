@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; font-family: Arial, sans-serif; color: #24313d; background: #f7f9fb; }
+main { max-width: 1000px; margin: 0 auto; }
+h1 { text-align: center; color: #18324b; }
+.galeria { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 24px; }
+.estacion { text-align: center; }
+.estacion img { width: 300px; height: 300px; object-fit: contain; background: white; }
+.foto-grande { display: block; width: 600px; height: 600px; max-width: 100%; object-fit: contain; background: white; margin: 20px auto; }
+.primavera { border: 5px solid #2e8b57; }
+.verano { border: 5px solid #e0a800; }
+.otono { border: 5px solid #c45a24; }
+.invierno { border: 5px solid #2878a5; }
+.volver { display: block; text-align: center; margin: 20px; }
