@@ -1,1 +1,143 @@
-<!-- Planes -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes de alojamiento web · NubeTorrent</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+        }
+
+        table {
+            width:80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        caption {
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 12px;
+        }
+
+        th,
+        td {
+            border: 1px solid #9aada8;
+            padding: 12px;
+            text-align: center;
+        }
+
+        thead th {
+            background-color: #10263d;
+            color: #ffffff;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #e5efed;
+        }
+
+        tbody th[scope="row"] {
+            text-align: left;
+        }
+
+        tfoot th,
+        tfoot td {
+            background-color: #ccebdc;
+            font-weight: bold;
+        }
+
+        thead th.business {
+    background-color: #167c6a;
+    color: #ffffff;
+}
+
+tbody td.business {
+    background-color: #dff3eb;
+    font-weight: bold;
+    border-left: 2px solid #75bda8;
+    border-right: 2px solid #75bda8;
+}
+
+tfoot td.business {
+    background-color: #bde5d5;
+    border-left: 2px solid #75bda8;
+    border-right: 2px solid #75bda8;
+}
+        .si {
+            color:green;
+        }
+
+        .no {
+            color: red;
+        }
+
+    </style>
+    </head>
+    <body>
+        <table>
+            <caption>Planes de alojamiento web · NubeTorrent</caption>
+        
+        <thead>
+            <tr>
+                <th colspan="2" rowspan="2">Característica</th>
+                <th colspan="3">Plan</th>
+                </tr>
+                <tr>
+                    <th>Básico</th>
+                    <th>Pro</th>
+                    <th class="business">Business</th>
+                </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th rowspan="3" scope="rowgroup">Recursos</th>
+                <th scope="row">Espacio en disco</th>
+                <td>10 GB</td>
+                <td>50 GB</td>
+                <td class="business">200 GB</td>
+            </tr>
+            <tr>
+                <th scope="row">Dominios</th>
+                <td>1</td>
+                <td>5</td>
+                <td class="business">Ilimitado</td>
+            </tr>
+            <tr>
+                <th scope="row">Copias de seguridad</th>
+                <td>Semanal</td>
+                <td>Diaria</td>
+                <td class="business">Diaria</td>
+            </tr>
+            <tr>
+                <th rowspan="2" scope="rowgroup">Soporte</th>
+                <th scope="row">Correo electrónico</th>
+                <td><span class="si">Sí</span></td>
+                <td><span class="si">Sí</span></td>
+                <td class="business"><span class="si">Sí</span></td>
+            </tr>
+            <tr>
+                <th scope="row">Teléfono 24h</th>
+                <td><span class="no">No</span></td>
+                <td><span class="no">No</span></td>
+                <td class="business"><span class="si">Sí</span></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2">Precio al mes</th>
+                <td>3€</td>
+                <td>9€</td>
+                <td class="business">19€</td>
+            </tr>
+        </tfoot>
+    </table>
+    </body>
+    </html>
+
+    <!-- Consulta de como hacer nth-child :  consulté por google, pero sobre todo en estas páginas https://developer.mozilla.org/es/docs/Learn_web_development/Core/Styling_basics/Tables y https://lineadecodigo.com/css/tablas-estilo-cebra-con-css/-->
+     <!-- Conseguí los colores para la tabla haciéndole una captura al resultado final y analizándolos en la página https://imagecolorpicker.com/-->
+      <!-- Para el reto de Business he destacado la columna con tonos de color diferente, en ese caso verde, y tambien he añadido unos bordes usando CSS y para poder aplicar esos estilos solo para esa columna en concreto, he añadido simplemente un "class="business" a cada una de las celdas de esa columna. -->
+       <!-- ¿Qué cambia en el rowspan?  Como ahora rowspan ocupa unas tres filas en total, en lugar de rowspan="2" se pone rowspan="3" porque hemos añadido una fila para "copias de seguridad" a las dos que ya tenía. -->
